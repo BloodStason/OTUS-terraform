@@ -4,30 +4,44 @@ import (
 	"fmt"
 	"flag"
 	"testing"
-	"time"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
 var folder = flag.String("folder", "", "Folder ID in Yandex.Cloud")
 
 func TestEndToEndDeploymentScenario(t *testing.T) {
+    fixtureFolder := "../"
 
-	terraformOptions := &terraform.Options{
-			TerraformDir: "../",
+    test_structure.RunTestStage(t, "setup", func() {
+		terraformOptions := &terraform.Options{
+			TerraformDir: fixtureFolder,
 
 			Vars: map[string]interface{}{
 			"yc_folder":    *folder,
 		    },
-	}
+	    }
 
-	defer terraform.Destroy(t, terraformOptions)
+		test_structure.SaveTerraformOptions(t, fixtureFolder, terraformOptions)
 
-	terraform.InitAndApply(t, terraformOptions)
+		terraform.InitAndApply(t, terraformOptions)
+	})
 
-	fmt.Println("Finish infra.....")
+	test_structure.RunTestStage(t, "validate", func() {
+	    fmt.Println("Run some tests...")
+	    terraformOptions := test_structure.LoadTerraformOptions(t, fixtureFolder)
 
-    time.Sleep(30 * time.Second)
+        // test load balancer ip existing
+	    loadbalancerIPAddress := terraform.Output(t, terraformOptions, "load_balancer_public_ip")
 
-    fmt.Println("Destroy infra.....")
+	    if loadbalancerIPAddress == "" {
+			t.Fatal("Cannot retrieve the public IP address value for the load balancer.")
+		}
+    })
+
+	test_structure.RunTestStage(t, "teardown", func() {
+		terraformOptions := test_structure.LoadTerraformOptions(t, fixtureFolder)
+		terraform.Destroy(t, terraformOptions)
+	})
 }
