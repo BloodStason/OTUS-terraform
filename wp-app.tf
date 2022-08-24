@@ -20,7 +20,7 @@ resource "yandex_compute_instance" "wp-app-1" {
   }
 
   metadata = {
-    ssh-keys = "nikandrov:${file("/home/nikandrov/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${file("/home/nikandrov/.ssh/id_rsa.pub")}"
   }
 }
 
@@ -46,6 +46,6 @@ resource "yandex_compute_instance" "wp-app-2" {
   }
 
   metadata = {
-    ssh-keys = "nikandrov:${file("/home/nikandrov/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${file("/home/nikandrov/.ssh/id_rsa.pub")}"
   }
 }
