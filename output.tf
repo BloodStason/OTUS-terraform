@@ -13,3 +13,8 @@ output "vm_linux_public_ip_address" {
   description = "VM IP"
   value = yandex_compute_instance.wp-app-1.network_interface[0].nat_ip_address
 }
+
+output "vm_linux_2_public_ip_address" {
+  description = "VM #2 IP"
+  value = yandex_compute_instance.wp-app-2.network_interface[0].nat_ip_address
+}
